@@ -1,7 +1,6 @@
 require "../openssl"
 
-class OpenSSL::SSL::Socket
-  include IO
+class OpenSSL::SSL::Socket < IO
 
   def initialize(io, @context : Context)
     @handle = LibSSL.ssl_new(@context)
