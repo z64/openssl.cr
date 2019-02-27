@@ -35,4 +35,10 @@ describe OpenSSL::Cipher do
     String.new(s1.to_unsafe).should eq(data)
     s1.should eq(s2)
   end
+
+  it "pkcs5_keyivgen" do
+    cipher = OpenSSL::Cipher.new("aes-128-cbc")
+    cipher.pkcs5_keyivgen("password")
+    cipher.pkcs5_keyivgen("password", "12345678")
+  end
 end

@@ -50,8 +50,8 @@ class OpenSSL::Cipher
   end
 
   # PKCS5 v1.5 implementation
-  def pkcs5_keyivgen(pass, salt = Pointer(UInt8).null, iter = 2048, digest = "md5")
-    raise "salt must be an 8-octet string" if salt != Pointer(UInt8).null && salt.bytesize != LibCrypto::PKCS5_SALT_LEN
+  def pkcs5_keyivgen(pass, salt = "", iter = 2048, digest = "md5")
+    raise "salt must be an 8-octet string (got: #{salt.bytesize})" if !salt.empty? && salt.bytesize != LibCrypto::PKCS5_SALT_LEN
 
     md = case digest
          when Digest
@@ -64,11 +64,10 @@ class OpenSSL::Cipher
     key = Array(UInt8).new(LibCrypto::EVP_MAX_KEY_LENGTH)
     iv = Array(UInt8).new(LibCrypto::EVP_MAX_IV_LENGTH)
 
-    keybytes = LibCrypto.evp_bytestokey(@ctx, md, salt, pass, pass.bytesize, iter, key, iv)
+    keybytes = LibCrypto.evp_bytestokey(cipher, md, salt, pass, pass.bytesize, iter, key, iv)
     if keybytes == 0
       raise Error.new "EVP_BytesToKey"
     end
-    key.length = keybytes
 
     cipherinit key: key, iv: iv
 
